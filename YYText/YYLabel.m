@@ -16,15 +16,21 @@
 #import "NSAttributedString+YYText.h"
 #import <libkern/OSAtomic.h>
 
-
+//获取后台线程
 static dispatch_queue_t YYLabelGetReleaseQueue() {
     return dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0);
 }
 
-
+//在几秒钟内，手指必须按住，以作长时间的按压动作。
 #define kLongPressMinimumDuration 0.5 // Time in seconds the fingers must be held down for long press gesture.
+
+//在长媒体失败之前允许的最大移动点。
 #define kLongPressAllowableMovement 9.0 // Maximum movement in points allowed before the long press fails.
+
+//以秒为单位，突出显示fadeout动画。
 #define kHighlightFadeDuration 0.15 // Time in seconds for highlight fadeout animation.
+
+//以秒为单位的异步显示fadeout动画。
 #define kAsyncFadeDuration 0.08 // Time in seconds for async display fadeout animation.
 
 
@@ -95,10 +101,15 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
     YYTextLayout *layout = _innerLayout;
     _innerLayout = nil;
     _shrinkInnerLayout = nil;
+    
+    //后台释放
     dispatch_async(YYLabelGetReleaseQueue(), ^{
+        
+        //放到后台释放。
         NSAttributedString *text = [layout text]; // capture to block and release in background
         if (layout.attachments.count) {
             dispatch_async(dispatch_get_main_queue(), ^{
+                //主线程中释放(可能有UIView/CALayer附件)。
                 [text length]; // capture to block and release in main thread (maybe there's UIView/CALayer attachments).
             });
         }
@@ -114,6 +125,8 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
 }
 
 + (YYTextLayout *)_shrinkLayoutWithLayout:(YYTextLayout *)layout {
+    //判断有 text 而且 行数为0
+    //_shrinkLayout 为简化的layout 行数为1
     if (layout.text.length && layout.lines.count == 0) {
         YYTextContainer *container = layout.container.copy;
         container.maximumNumberOfRows = 1;
@@ -204,7 +217,7 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
         NSMutableAttributedString *hiText = _innerText.mutableCopy;
         NSDictionary *newAttrs = _highlight.attributes;
         [newAttrs enumerateKeysAndObjectsUsingBlock:^(NSString *key, id value, BOOL *stop) {
-            [hiText yy_setAttribute:key value:value range:_highlightRange];
+            [hiText yy_setAttribute:key value:value range:self->_highlightRange];
         }];
         _highlightLayout = [YYTextLayout layoutWithContainer:_innerContainer text:hiText];
         _shrinkHighlightLayout = [YYLabel _shrinkLayoutWithLayout:_highlightLayout];

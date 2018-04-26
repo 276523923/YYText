@@ -185,8 +185,8 @@
 
 - (void)_doBlink {
     [UIView animateWithDuration:kBlinkFadeDuration delay:0 options:UIViewAnimationOptionCurveEaseInOut animations: ^{
-        if (_caretView.alpha == 1) _caretView.alpha = 0;
-        else _caretView.alpha = 1;
+        if (self.caretView.alpha == 1) self.caretView.alpha = 0;
+        else self.caretView.alpha = 1;
     } completion:NULL];
 }
 
@@ -273,7 +273,7 @@
         } else {
             if (rect.size.width > 0 && rect.size.height > 0) {
                 UIView *mark = [[UIView alloc] initWithFrame:rect];
-                mark.backgroundColor = _color;
+                mark.backgroundColor = self.color;
                 mark.alpha = kMarkAlpha;
                 [self insertSubview:mark atIndex:0];
                 [self.markViews addObject:mark];

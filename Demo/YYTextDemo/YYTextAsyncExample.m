@@ -128,7 +128,7 @@
     toolbar.size = CGSizeMake(kScreenWidth, 40);
     toolbar.top = kiOS7Later ? 64 : 0;
     [self.view addSubview:toolbar];
-    
+    toolbar = [toolbar valueForKey:@"contentView"];
     
     YYFPSLabel *fps = [YYFPSLabel new];
     fps.centerY = toolbar.height / 2;
@@ -163,10 +163,10 @@
     [self.tableView.visibleCells enumerateObjectsUsingBlock:^(YYTextAsyncExampleCell *cell, NSUInteger idx, BOOL *stop) {
         cell.async = async;
         NSIndexPath *indexPath = [self.tableView indexPathForCell:cell];
-        if (_async) {
-            [cell setAyncText:_layouts[indexPath.row]];
+        if (self.async) {
+            [cell setAyncText:self.layouts[indexPath.row]];
         } else {
-            [cell setAyncText:_strings[indexPath.row]];
+            [cell setAyncText:self.strings[indexPath.row]];
         }
     }];
 }
